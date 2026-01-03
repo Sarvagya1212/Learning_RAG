@@ -1,0 +1,36 @@
+# ============================================
+# RuleMirror Dependencies
+# Install: pip install -r requirements.txt
+# ============================================
+
+# --- Core ---
+python-dotenv          # Environment variables
+pydantic>=2.0          # Data validation
+
+# --- Document Processing ---
+pypdf                  # PDF parsing
+unstructured           # Advanced document parsing
+
+# --- LLM & Orchestration ---
+langchain              # Agent orchestration
+langchain-community    # Community integrations
+mistralai              # Mistral AI client
+
+# --- Vector Database ---
+qdrant-client          # Qdrant vector store
+
+# --- Embeddings & Reranking ---
+sentence-transformers  # Embeddings + Cross-Encoder reranking
+
+# --- Multi-Agent Framework ---
+crewai                 # Multi-agent workflows
+
+# --- Backend ---
+fastapi                # API framework
+uvicorn                # ASGI server
+
+# --- Frontend ---
+streamlit              # UI
+
+# --- Evaluation (optional) ---
+ragas                # RAG evaluation metrics
