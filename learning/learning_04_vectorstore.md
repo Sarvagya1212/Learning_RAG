@@ -53,7 +53,7 @@ client.upsert(collection_name="policies", points=[
 ])
 
 # 4. Search
-results = client.search(
+results = client.query_points(
     collection_name="policies",
     query_vector=[...],
     limit=5
@@ -68,7 +68,7 @@ results = client.search(
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 # Search only in "Payment Terms" section
-results = client.search(
+results = client.query_points(
     collection_name="policies",
     query_vector=embedding,
     query_filter=Filter(must=[
