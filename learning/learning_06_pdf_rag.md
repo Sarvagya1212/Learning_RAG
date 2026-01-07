@@ -91,17 +91,7 @@ Output: ["ABCDE", "DEFGH", "GHIJK", "JKLMN", "MNO"]
 ```python
 def chunk_with_overlap(text: str, chunk_size: int, overlap: int) -> list:
     """
-    Split text into overlapping chunks.
     
-    Args:
-        text: Input string
-        chunk_size: Size of each chunk
-        overlap: Number of overlapping characters
-        
-    Returns:
-        List of chunks
-    """
-    # YOUR CODE HERE
     pass
 
 # Test
@@ -289,6 +279,7 @@ def find_top_k_similar(query: list, documents: list, k: int) -> list:
         scored.append((score, doc_id))
     
     # Sort by score descending
+    
     scored.sort(reverse=True, key=lambda x: x[0])
     
     # Return top K doc_ids

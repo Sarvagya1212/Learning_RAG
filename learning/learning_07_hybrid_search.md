@@ -268,3 +268,232 @@ LESSON 7: Understanding Reciprocal Rank Fusion (RRF)
     - Hybrid gives the best of both worlds! 🎯
 
     Next: We'll integrate this into the full pipeline!
+
+---
+
+## 🧩 Practice Problems (Data Structures)
+
+These problems will help you understand the core algorithms used in `hybrid_search.py`.
+
+---
+
+### Problem 1: Term Frequency Counter (BM25 Foundation)
+**Concept:** This is how BM25 calculates term frequency
+
+```
+Given a document and a query, count how many times each query term appears.
+
+Input:
+  document = "payment must be made within 30 days of payment receipt"
+  query = ["payment", "days", "invoice"]
+
+Output:
+  {"payment": 2, "days": 1, "invoice": 0}
+```
+
+**Your Task:** Implement `count_term_frequency(document, query_terms)`
+
+```python
+def count_term_frequency(document: str, query_terms: list) -> dict:
+    """
+    Count occurrences of each query term in the document.
+    
+    Args:
+        document: The document text
+        query_terms: List of terms to count
+        
+    Returns:
+        Dictionary mapping each term to its count
+    """
+    # YOUR CODE HERE
+    pass
+
+# Test
+doc = "the quick brown fox jumps over the lazy dog the fox"
+query = ["the", "fox", "cat"]
+assert count_term_frequency(doc, query) == {"the": 3, "fox": 2, "cat": 0}
+```
+
+<details>
+<summary>💡 Hint</summary>
+Use a Counter or dict, split document into words, count matches
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```python
+def count_term_frequency(document: str, query_terms: list) -> dict:
+    words = document.lower().split()
+    result = {}
+    
+    for term in query_terms:
+        term_lower = term.lower()
+        result[term] = words.count(term_lower)
+    
+    return result
+```
+</details>
+
+---
+
+### Problem 2: Reciprocal Rank Fusion (RRF)
+**Concept:** This is how `reciprocal_rank_fusion()` combines search results
+
+```
+Given rankings from two search methods, compute RRF scores.
+Formula: RRF_score(doc) = Σ 1/(k + rank), where k=60
+
+Input:
+  bm25_ranking = ["doc_a", "doc_b", "doc_c"]  # ranks: 0, 1, 2
+  vector_ranking = ["doc_b", "doc_a", "doc_d"]  # ranks: 0, 1, 2
+  k = 60
+
+Output (sorted by RRF score):
+  [("doc_b", 0.0331), ("doc_a", 0.0328), ("doc_c", 0.0161), ("doc_d", 0.0161)]
+```
+
+**Your Task:** Implement `compute_rrf(rankings, k)`
+
+```python
+def compute_rrf(rankings: list, k: int = 60) -> list:
+    """
+    Compute RRF scores for documents across multiple rankings.
+    
+    Args:
+        rankings: List of ranking lists (each is a list of doc_ids)
+        k: RRF constant (default 60)
+        
+    Returns:
+        List of (doc_id, score) tuples sorted by score descending
+    """
+    # YOUR CODE HERE
+    pass
+
+# Test
+bm25 = ["A", "B", "C"]
+vector = ["B", "A", "D"]
+result = compute_rrf([bm25, vector], k=60)
+assert result[0][0] == "B"  # B should rank first
+assert result[1][0] == "A"  # A should rank second
+```
+
+<details>
+<summary>💡 Hint</summary>
+1. Create a dict to accumulate scores per doc
+2. For each ranking list, add 1/(k + rank) to each doc's score
+3. Sort by score descending
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```python
+def compute_rrf(rankings: list, k: int = 60) -> list:
+    scores = {}
+    
+    for ranking in rankings:
+        for rank, doc_id in enumerate(ranking):
+            if doc_id not in scores:
+                scores[doc_id] = 0
+            scores[doc_id] += 1 / (k + rank)
+    
+    # Sort by score descending
+    sorted_results = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return sorted_results
+```
+</details>
+
+---
+
+### Problem 3: Merge K Sorted Lists (Top-K Selection)
+**Concept:** This is useful for efficiently combining results from multiple search sources
+
+```
+Given K sorted lists of (score, doc_id), merge into one sorted list.
+This is a classic heap problem!
+
+Input:
+  lists = [
+      [(0.9, "A"), (0.7, "B"), (0.5, "C")],  # BM25 results
+      [(0.8, "D"), (0.6, "A"), (0.4, "E")],  # Vector results
+  ]
+  
+Output (merged, sorted by score descending):
+  [(0.9, "A"), (0.8, "D"), (0.7, "B"), (0.6, "A"), (0.5, "C"), (0.4, "E")]
+```
+
+**Your Task:** Implement `merge_k_sorted(lists)`
+
+```python
+import heapq
+
+def merge_k_sorted(lists: list) -> list:
+    """
+    Merge K sorted lists into one sorted list.
+    
+    Args:
+        lists: List of sorted lists, each containing (score, doc_id) tuples
+               (sorted descending by score)
+        
+    Returns:
+        Merged list sorted by score descending
+    """
+    # YOUR CODE HERE
+    pass
+
+# Test
+l1 = [(0.9, "A"), (0.5, "B")]
+l2 = [(0.8, "C"), (0.3, "D")]
+result = merge_k_sorted([l1, l2])
+assert result == [(0.9, "A"), (0.8, "C"), (0.5, "B"), (0.3, "D")]
+```
+
+<details>
+<summary>💡 Hint</summary>
+Use a max-heap (negate scores for min-heap). Push first element from each list, pop smallest, push next from that list.
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```python
+import heapq
+
+def merge_k_sorted(lists: list) -> list:
+    # Use min-heap with negated scores for max behavior
+    heap = []
+    
+    # Initialize heap with first element from each list
+    for i, lst in enumerate(lists):
+        if lst:
+            score, doc_id = lst[0]
+            # (negated_score, list_index, item_index, doc_id)
+            heapq.heappush(heap, (-score, i, 0, doc_id))
+    
+    result = []
+    
+    while heap:
+        neg_score, list_idx, item_idx, doc_id = heapq.heappop(heap)
+        result.append((-neg_score, doc_id))
+        
+        # Push next item from same list
+        next_idx = item_idx + 1
+        if next_idx < len(lists[list_idx]):
+            next_score, next_doc = lists[list_idx][next_idx]
+            heapq.heappush(heap, (-next_score, list_idx, next_idx, next_doc))
+    
+    return result
+```
+</details>
+
+---
+
+## 🎯 Why These Matter
+
+| Problem | Hybrid Search Function | Real-World Use |
+|---------|------------------------|----------------|
+| Term Frequency | `BM25Okapi` scoring | Keyword relevance |
+| RRF | `reciprocal_rank_fusion()` | Combining search rankings |
+| Merge K Sorted | Efficient result merging | Multi-source aggregation |
+
